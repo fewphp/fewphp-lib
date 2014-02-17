@@ -1,0 +1,13 @@
+{
+    "name": "fewphp/fewphp",
+    "description": "fewphplib",
+    "authors": [
+        {
+            "name": "Breezess",
+            "email": "s88858@163.com"
+        }
+    ],
+    "require": {
+
+    }
+}
