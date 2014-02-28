@@ -83,4 +83,84 @@ class Database extends PDO {
         return $this->exec("DELETE FROM $table WHERE $where LIMIT $limit");
     }
 
+    public function read($model, $queryData) {
+        $null = null;
+        $query = $this->generateAssociationQuery();
+        $resultSet = $this->fetchAll($query);
+        return $resultSet;
+    }
+
+    public function generateAssociationQuery() {
+        return null;
+    }
+
+    public function fetchAll($sql, $params = array(), $options = array()) {
+//        $result = $this->execute($sql, array(), $params);
+//        if ($result) {
+//            return $result;
+//        }
+        return false;
+    }
+
+    public function buildStatement($query, $model) {
+        $query = array_merge($this->_queryDefaults, $query);
+        if (!empty($query['joins'])) {
+            $count = count($query['joins']);
+            for ($i = 0; $i < $count; $i++) {
+                if (is_array($query['joins'][$i])) {
+                    $query['joins'][$i] = $this->buildJoinStatement($query['joins'][$i]);
+                }
+            }
+        }
+        return $this->renderStatement('select', array(
+                    'conditions' => $this->conditions($query['conditions'], true, true, $model),
+                    'fields' => implode(', ', $query['fields']),
+                    'table' => $query['table'],
+                    'alias' => $this->alias . $this->name($query['alias']),
+                    'order' => $this->order($query['order'], 'ASC', $model),
+                    'limit' => $this->limit($query['limit'], $query['offset']),
+                    'joins' => implode(' ', $query['joins']),
+                    'group' => $this->group($query['group'], $model)
+        ));
+    }
+
+    public function renderStatement($type, $data) {
+        extract($data);
+        $aliases = null;
+
+        switch (strtolower($type)) {
+            case 'select':
+                return trim("SELECT {$fields} FROM {$table} {$alias} {$joins} {$conditions} {$group} {$order} {$limit}");
+            case 'create':
+                return "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
+            case 'update':
+                if (!empty($alias)) {
+                    $aliases = "{$this->alias}{$alias} {$joins} ";
+                }
+                return trim("UPDATE {$table} {$aliases}SET {$fields} {$conditions}");
+            case 'delete':
+                if (!empty($alias)) {
+                    $aliases = "{$this->alias}{$alias} {$joins} ";
+                }
+                return trim("DELETE {$alias} FROM {$table} {$aliases}{$conditions}");
+            case 'schema':
+                foreach (array('columns', 'indexes', 'tableParameters') as $var) {
+                    if (is_array(${$var})) {
+                        ${$var} = "\t" . implode(",\n\t", array_filter(${$var}));
+                    }
+                    else {
+                        ${$var} = '';
+                    }
+                }
+                if (trim($indexes) !== '') {
+                    $columns .= ',';
+                }
+                return "CREATE TABLE {$table} (\n{$columns}{$indexes}) {$tableParameters};";
+            case 'alter':
+                return;
+        }
+    }
+
 }
+
+// end

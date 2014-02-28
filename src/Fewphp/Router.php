@@ -15,7 +15,6 @@ class Router {
      *
      */
     public function init() {
-        require 'Bootstrap.php';
         // 获取url
         $this->_getUrl();
 

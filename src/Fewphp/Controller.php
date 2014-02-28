@@ -17,11 +17,13 @@ class Controller {
      * @param string $path Location of the models
      */
     public function loadModel($name) {
-        $path = APP . MODEL . $name . 'Model.php';
+        $path = APP . MODEL . $name . '.php';
         if (file_exists($path)) {
-            require $path;
-            $modelName = $name . 'Model';
-            $this->model = new $modelName();
+            $this->{$name} = new $name();
+        }
+        else {
+            echo "No  {$name}";
+            exit;
         }
     }
 

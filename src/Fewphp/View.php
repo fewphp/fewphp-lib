@@ -28,6 +28,3 @@ class View {
     }
 
 }
-
-// end
-
