@@ -19,7 +19,7 @@ class Controller {
     public function loadModel($name) {
         $path = APP . MODEL . $name . '.php';
         if (file_exists($path)) {
-            $this->{$name} = new $name();
+            $this->{$name} = new $name('xx');
         }
         else {
             echo "No  {$name}";

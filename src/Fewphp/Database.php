@@ -6,6 +6,19 @@ use PDO;
 
 class Database extends PDO {
 
+    public $alias = 'AS ';
+    protected $_queryDefaults = array(
+        'conditions' => array(),
+        'fields' => null,
+        'table' => null,
+        'alias' => null,
+        'order' => null,
+        'limit' => null,
+        'joins' => array(),
+        'group' => null,
+        'offset' => null
+    );
+
     public function __construct($DB_TYPE, $DB_HOST, $DB_NAME, $DB_USER, $DB_PASS) {
         parent::__construct($DB_TYPE . ':host=' . $DB_HOST . ';dbname=' . $DB_NAME, $DB_USER, $DB_PASS);
     }
@@ -85,20 +98,27 @@ class Database extends PDO {
 
     public function read($model, $queryData) {
         $null = null;
-        $query = $this->generateAssociationQuery();
+        $query = $this->generateQuery($model, $queryData);
         $resultSet = $this->fetchAll($query);
         return $resultSet;
     }
 
-    public function generateAssociationQuery() {
-        return null;
+    public function generateQuery($model, $query) {
+        if (empty($query['fields'])) {
+            $query['fields'] = $this->fields($model->table, $model->alias);
+        }
+
+        var_dump($this->buildStatement($query, $model));
+        return $this->buildStatement($query, $model);
     }
 
     public function fetchAll($sql, $params = array(), $options = array()) {
-//        $result = $this->execute($sql, array(), $params);
-//        if ($result) {
-//            return $result;
-//        }
+        $sth = $this->prepare($sql);
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result) {
+            return $result;
+        }
         return false;
     }
 
@@ -112,11 +132,12 @@ class Database extends PDO {
                 }
             }
         }
+
         return $this->renderStatement('select', array(
-                    'conditions' => $this->conditions($query['conditions'], true, true, $model),
+                    'conditions' => $this->conditions($query['conditions'], $model),
                     'fields' => implode(', ', $query['fields']),
-                    'table' => $query['table'],
-                    'alias' => $this->alias . $this->name($query['alias']),
+                    'table' => "`{$model->table}`",
+                    'alias' => $this->alias . "`{$model->alias}`",
                     'order' => $this->order($query['order'], 'ASC', $model),
                     'limit' => $this->limit($query['limit'], $query['offset']),
                     'joins' => implode(' ', $query['joins']),
@@ -159,6 +180,45 @@ class Database extends PDO {
             case 'alter':
                 return;
         }
+    }
+
+    public function conditions() {
+        return 'WHERE 1 = 1 ';
+    }
+
+    public function name() {
+        return null;
+    }
+
+    public function order() {
+        return null;
+    }
+
+    public function limit($limit, $offset) {
+        if ($limit === 1) {
+            return "limit {$limit}";
+        }
+        return null;
+    }
+
+    public function group() {
+        return null;
+    }
+
+    public function buildJoinStatement() {
+        return null;
+    }
+
+    public function fields($useTable, $alias) {
+        $sth = $this->prepare("DESCRIBE {$useTable}");
+        $sth->execute();
+        $fields = $sth->fetchAll(PDO::FETCH_COLUMN);
+        if (!empty($fields)) {
+            foreach ($fields as $k => $field) {
+                $fields[$k] = "`{$alias}`.`{$field}`";
+            }
+        }
+        return $fields;
     }
 
 }

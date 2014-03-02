@@ -6,7 +6,10 @@ use fewphp\Database;
 
 class Model {
 
-    public $id = false;
+    public $useTable = null;
+    public $table = null;
+    public $id = null;
+    public $primaryKey = 'id';
     public $order = null;
     public $alias = null;
     public $findMethods = array(
@@ -14,8 +17,18 @@ class Model {
         'neighbors' => true, 'list' => true, 'threaded' => true
     );
 
-    function __construct() {
+    public function __construct() {
         $this->db = new Database(DB_TYPE, DB_HOST, DB_NAME, DB_USER, DB_PASS);
+        $className = get_class($this);
+        if (empty($this->useTable)) {
+            $this->useTable = strtolower($className);
+        }
+
+        if (empty($this->alias)) {
+            $this->alias = $className;
+        }
+
+        $this->table = $this->useTable;
     }
 
     public function find($type = 'first', $query = array()) {
@@ -29,8 +42,8 @@ class Model {
         return $this->_readDataSource($type, $query);
     }
 
-    public function query() {
-
+    public function query($sql) {
+        return $this->db->fetchAll($sql);
     }
 
     public function save() {
@@ -97,22 +110,10 @@ class Model {
         }
 
         if ($query['order'] === null && $this->order !== null) {
-            $query['order'] = $this->order;
+            $query ['order'] = $this->order;
         }
 
         $query['order'] = array($query['order']);
-
-//        if ($query['callbacks'] === true || $query['callbacks'] === 'before') {
-//            $event = new CakeEvent('Model.beforeFind', $this, array($query));
-//            list($event->break, $event->breakOn, $event->modParams) = array(true, array(false, null), 0);
-//            $this->getEventManager()->dispatch($event);
-//
-//            if ($event->isStopped()) {
-//                return null;
-//            }
-//
-//            $query = $event->result === true ? $event->data[0] : $event->result;
-//        }
 
         return $query;
     }
@@ -121,7 +122,6 @@ class Model {
         $results = $this->db->read($this, $query);
 
         $this->findQueryType = null;
-
         if ($this->findMethods[$type] === true) {
             return $this->{'_find' . ucfirst($type)}('after', $query, $results);
         }
@@ -136,8 +136,22 @@ class Model {
         if (empty($results[0])) {
             return array();
         }
-
         return $results[0];
+    }
+
+    protected function _findAll($state, $query, $results = array()) {
+        if ($state === 'before') {
+            return $query;
+        }
+        return $results;
+    }
+
+    protected function _findCount($state, $query, $results = array()) {
+        if ($state === 'before') {
+            $query['fields'] = array('count(*)');
+            return $query;
+        }
+        return $results[0]['count(*)'];
     }
 
 }
