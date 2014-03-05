@@ -7,9 +7,6 @@ class Controller {
     public $layout = 'default';
     public $viewVars = array();
 
-    function __construct() {
-        $this->view = new View();
-    }
 
     /**
      *
