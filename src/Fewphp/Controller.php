@@ -19,9 +19,8 @@ class Controller {
     public function loadModel($name) {
         $path = APP . MODEL . $name . '.php';
         if (file_exists($path)) {
-            $this->{$name} = new $name('xx');
-        }
-        else {
+            $this->{$name} = new $name();
+        } else {
             echo "No  {$name}";
             exit;
         }
@@ -31,15 +30,14 @@ class Controller {
         if (is_array($one)) {
             if (is_array($two)) {
                 $data = array_combine($one, $two);
-            }
-            else {
+            } else {
                 $data = $one;
             }
-        }
-        else {
+        } else {
             $data = array($one => $two);
         }
         $this->viewVars = $data + $this->viewVars;
     }
 
 }
+// end
