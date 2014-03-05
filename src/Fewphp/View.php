@@ -20,8 +20,8 @@ class View {
                 $debugbarRenderer = $debugbar->getJavascriptRenderer();
 
                 $debugbar["messages"]->addMessage("hello world!");
+                echo $debugbarRenderer->renderHead();
                 echo $debugbarRenderer->render();
-                exit;
                 break;
             default:
                 $this->url[1] = isset($this->url[1]) ? strtolower($this->url[1]) : 'index';
@@ -35,3 +35,5 @@ class View {
     }
 
 }
+
+// end
