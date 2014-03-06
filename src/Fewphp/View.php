@@ -31,7 +31,7 @@ class View {
                         new FileAsset($jsFiles[1]),
                         new FileAsset($jsFiles[2]),
                         new FileAsset($jsFiles[3]),
-                        ), array(
+                            ), array(
                         new JsYuiCompressorFilter(VENDOR . 'nervo/yuicompressor/yuicompressor.jar'),
                     ));
 
@@ -42,36 +42,18 @@ class View {
                 if (!file_exists(CSS . 'debug.css')) {
 
                     $css = new AssetCollection(array(
-                        new FileAsset($cssFiles[0]),
+//                        new FileAsset($cssFiles[0]),
                         new FileAsset($cssFiles[1]),
                         new FileAsset($cssFiles[2]),
                         new FileAsset($cssFiles[3]),
-                        ), array(
+                            ), array(
                         new CssYuiCompressorFilter(VENDOR . 'nervo/yuicompressor/yuicompressor.jar'),
                     ));
-
                     $strCss = $css->dump();
                     file_put_contents(CSS . 'debug.css', $strCss);
                 }
-                
-                
-                if (!file_exists(IMAGES . 'debug.css')) {
 
-                    $css = new AssetCollection(array(
-                        new FileAsset($cssFiles[0]),
-                        new FileAsset($cssFiles[1]),
-                        new FileAsset($cssFiles[2]),
-                        new FileAsset($cssFiles[3]),
-                        ), array(
-                        new CssYuiCompressorFilter(VENDOR . 'nervo/yuicompressor/yuicompressor.jar'),
-                    ));
-
-                    $strCss = $css->dump();
-                    file_put_contents(CSS . 'debug.css', $strCss);
-                }
-                
-
-                echo '</style><link rel="stylesheet" href="/css/debug.css" />'
+                echo '<link rel="stylesheet" href="/css/debug.css" />'
                 . '<script type="text/javascript" src="/js/debug.js"></script>';
                 echo $debugbarRenderer->render();
                 break;
