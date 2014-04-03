@@ -2,6 +2,8 @@
 
 namespace fewphp;
 
+use Kint;
+
 class Router {
 
     private $_url = null;
@@ -123,10 +125,7 @@ class Router {
      * @return boolean
      */
     private function _error() {
-//        require APP . DS . $this->_controllerPath . $this->_errorFile;
-//        $this->_controller = new Error();
-//        $this->_controller->index();
-        exit('错误');
+        Kint::trace();
     }
 
 }
