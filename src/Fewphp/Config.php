@@ -4,6 +4,11 @@ namespace fewphp;
 
 class Config {
 
+    /**
+     * 读取配置文件
+     * @param type $path
+     * @return type
+     */
     public static function read($path) {
         $array = explode('.', $path);
         $config = include APP . 'Config' . DS . $array[0] . '.php';
