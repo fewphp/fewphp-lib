@@ -8,28 +8,38 @@ class Session {
         @session_start();
     }
 
-    public static function set($key, $value) {
+    public static function write($key, $value) {
         $_SESSION[$key] = $value;
     }
 
-    public static function get($key) {
+    public static function read($key) {
         if (isset($_SESSION[$key]))
             return $_SESSION[$key];
     }
 
-    public static function destroy() {
-        //unset($_SESSION);
-        session_destroy();
+    public static function delete($key = null) {
+        if ($key) {
+            unset($_SESSION[$key]);
+        }
+        else {
+            session_destroy();
+        }
     }
 
-    public static function check() {
-
+    public static function check($key) {
+        if (isset($_SESSION[$key])) {
+            return true;
+        }
+        return false;
     }
+    
+    public function setFlash($message, $element = 'default', $params = array(), $key = 'flash') {
+		self::write('Message.' . $key, compact('message', 'element', 'params'));
+	}
 
     public function flash($key = 'flash', $attrs = array()) {
         $out = false;
-
-        if (CakeSession::check('Message.' . $key)) {
+        if (self::check('Message.' . $key)) {
             $flash = self::read('Message.' . $key);
             $message = $flash['message'];
             unset($flash['message']);
@@ -50,9 +60,6 @@ class Session {
             }
             else {
                 $options = array();
-                if (isset($flash['params']['plugin'])) {
-                    $options['plugin'] = $flash['params']['plugin'];
-                }
                 $tmpVars = $flash['params'];
                 $tmpVars['message'] = $message;
                 $out = $this->_View->element($flash['element'], $tmpVars, $options);
@@ -63,3 +70,4 @@ class Session {
     }
 
 }
+// end

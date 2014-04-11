@@ -17,9 +17,11 @@ class Router {
      *
      */
     public function init() {
+        
         // 获取url
         $this->_getUrl();
 
+        Session::init();
         $this->_loadExistingController();
         $this->_callControllerAction();
         $this->_loadView();
