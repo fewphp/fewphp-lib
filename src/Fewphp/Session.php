@@ -62,7 +62,8 @@ class Session {
                 $options = array();
                 $tmpVars = $flash['params'];
                 $tmpVars['message'] = $message;
-                $out = $this->_View->element($flash['element'], $tmpVars, $options);
+                $view = new View();
+                $out = $view->element($flash['element'], $tmpVars, $options);
             }
             self::delete('Message.' . $key);
         }

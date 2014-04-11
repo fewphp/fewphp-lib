@@ -11,8 +11,14 @@ class View {
     public function render($name) {
         $this->url = explode('/', trim($name));
     }
-
-    public function fetch($name) {
+    
+    /**
+     * 
+     * @param type $name
+     * @param type $a
+     * @return type
+     */
+    public function fetch($name, $param = array()) {
         switch ($name) {
             case 'sql_dump':
                 $sql_dump = '';
@@ -24,7 +30,7 @@ class View {
                 return '<table class="sql_dump"><tr><th>Nr</th><th>Query</th></tr>' . $sql_dump . '</table>';
                 break;
             case 'flash':
-                return Session::flash();
+                return Session::flash('flash', $param);
                 break;
             default:
                 $this->url[1] = isset($this->url[1]) ? strtolower($this->url[1]) : 'index';
@@ -47,6 +53,13 @@ class View {
      */
     public function log($sql) {
         $this->sqlLog[] = $sql;
+    }
+    
+    public function element($element, $param, $options) {
+        $Controller = new Controller();
+        $Controller->set('flash', $param);
+        var_dump($Controller);
+        return $this->layout($element);
     }
 
 }
