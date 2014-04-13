@@ -17,7 +17,7 @@ class Router {
      *
      */
     public function init() {
-        
+
         // 获取url
         $this->_getUrl();
 

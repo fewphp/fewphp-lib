@@ -11,9 +11,9 @@ class View {
     public function render($name) {
         $this->url = explode('/', trim($name));
     }
-    
+
     /**
-     * 
+     *
      * @param type $name
      * @param type $a
      * @return type
@@ -54,11 +54,12 @@ class View {
     public function log($sql) {
         $this->sqlLog[] = $sql;
     }
-    
+
     public function element($element, $param, $options) {
-        $Controller = new Controller();
-        $Controller->set('flash', $param);
-        var_dump($Controller);
+        foreach ($param as $k => $v) {
+            $this->$k = $v;
+        }
+
         return $this->layout($element);
     }
 
