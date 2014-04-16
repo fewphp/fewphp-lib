@@ -15,6 +15,7 @@ class Session {
     public static function read($key) {
         if (isset($_SESSION[$key]))
             return $_SESSION[$key];
+        return null;
     }
 
     public static function delete($key = null) {

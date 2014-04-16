@@ -45,7 +45,14 @@ class Router {
         if (empty($this->_url[0])) {
             $this->_url[0] = $this->_defaultFile;
         }
-        else {
+        elseif (strpos($this->_url[0], '_') !== false) {
+            $this->_url[0] = explode('_', $this->_url[0]);
+            $url = '';
+            foreach ($this->_url[0] as $value) {
+                $url .= ucfirst($value);
+            }
+            $this->_url[0] = $url;
+        } else {
             $this->_url[0] = ucfirst($this->_url[0]);
         }
 

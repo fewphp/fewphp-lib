@@ -33,6 +33,13 @@ class Controller {
         }
         $this->viewVars = $data + $this->viewVars;
     }
+    
+    public function redirect($url) {
+
+        if ($url !== null) {
+            header('Location ' . $url);
+        }
+    }
 
 }
 
