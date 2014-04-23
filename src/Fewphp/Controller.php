@@ -6,6 +6,10 @@ class Controller {
 
     public $layout = 'default';
     public $viewVars = array();
+    
+    public function __construct() {
+        $this->controller  = substr(get_class($this), 0, -10);
+    }
 
     /**
      *
@@ -35,10 +39,19 @@ class Controller {
     }
     
     public function redirect($url) {
-
-        if ($url !== null) {
-            header('Location ' . $url);
+        if (!$this->is_url($url)) {
+            $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') 
+                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) 
+                ? 'https://' : 'http://';
+            $url = $http_type . $_SERVER['HTTP_HOST'] . '/' . $url;
         }
+        header('Location: ' . $url);
+        exit;
+    }
+    
+    
+    public function is_url($str) {
+        return preg_match("/^http:\/\/[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\’:+!]*([^<>\"])*$/", $str);
     }
 
 }

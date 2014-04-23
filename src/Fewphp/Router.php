@@ -52,9 +52,10 @@ class Router {
                 $url .= ucfirst($value);
             }
             $this->_url[0] = $url;
-        } else {
+        } 
+        else {
             $this->_url[0] = ucfirst($this->_url[0]);
-        }
+        }   
 
         $file = APP . $this->_controllerPath . $this->_url[0] . 'Controller.php';
         if (file_exists($file)) {
@@ -68,7 +69,7 @@ class Router {
             return false;
         }
     }
-
+    
     /**
      * 带参数调用方法
      *

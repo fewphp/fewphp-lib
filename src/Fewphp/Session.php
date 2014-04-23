@@ -34,7 +34,7 @@ class Session {
         return false;
     }
     
-    public function setFlash($message, $element = 'default', $params = array(), $key = 'flash') {
+    public function setFlash($message, $params = array(), $key = 'flash', $element = 'default') {
 		self::write('Message.' . $key, compact('message', 'element', 'params'));
 	}
 
