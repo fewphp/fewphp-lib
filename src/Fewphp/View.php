@@ -44,7 +44,7 @@ class View {
      * @param type $layout
      */
     public function layout($layout) {
-        require APP . VIEW . 'layout' . DS . $layout . '.php';
+        include APP . VIEW . 'layout' . DS . $layout . '.php';
     }
 
     /**
