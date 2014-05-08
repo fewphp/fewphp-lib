@@ -5,16 +5,36 @@ namespace fewphp;
 class Session {
 
     public static function init() {
-        @session_start();
+        session_start();
     }
 
     public static function write($key, $value) {
-        $_SESSION[$key] = $value;
+        if (stripos($key, '.')) {
+            $array = explode('.', $key);
+//            $array = array_flip($array);
+            $tmp = array();
+            foreach ($array as $k => $v) {
+//                $tmp[$v] =  
+            }
+            var_dump($array);
+        }
+        else {
+            $_SESSION[$key] = $value;
+        }
     }
 
     public static function read($key) {
-        if (isset($_SESSION[$key]))
+        if (stripos($key, '.')) {
+            $array = explode('.', $key);
+            $tmp = $_SESSION;
+            foreach ($array as $v) {
+                $tmp = $tmp[$v];
+            }
+            return $tmp;
+        }
+        elseif (isset($_SESSION[$key])) {
             return $_SESSION[$key];
+        }
         return null;
     }
 
@@ -28,11 +48,22 @@ class Session {
     }
 
     public static function check($key) {
+        if (stripos($key, '.')) {
+            $array = explode('.', $key);
+            $tmp = $_SESSION;
+            foreach ($array as $v) {
+                $tmp = $tmp[$v];
+            }
+            if (!empty($tmp)) {
+                return true;
+            }
+        }
         if (isset($_SESSION[$key])) {
             return true;
         }
         return false;
     }
+    
     
     public function setFlash($message, $params = array(), $key = 'flash', $element = 'default') {
 		self::write('Message.' . $key, compact('message', 'element', 'params'));
