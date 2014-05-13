@@ -6,17 +6,20 @@ class Session {
 
     public static function init() {
         session_start();
+        $_SESSION['1'] = 1;
     }
 
     public static function write($key, $value) {
         if (stripos($key, '.')) {
-            $array = explode('.', $key);
-//            $array = array_flip($array);
-            $tmp = array();
-            foreach ($array as $k => $v) {
-//                $tmp[$v] =  
+            $write = array($key => $value);
+            foreach ($write as $k => $val) {
+                self::_overwrite($_SESSION, self::_write($_SESSION, $k, $val));
+//                if (Hash::get($_SESSION, $key) !== $val) {
+//                    return false;
+//                }
             }
-            var_dump($array);
+            var_dump($_SESSION);
+            return true;
         }
         else {
             $_SESSION[$key] = $value;
@@ -63,11 +66,10 @@ class Session {
         }
         return false;
     }
-    
-    
+
     public function setFlash($message, $params = array(), $key = 'flash', $element = 'default') {
-		self::write('Message.' . $key, compact('message', 'element', 'params'));
-	}
+        self::write('Message.' . $key, compact('message', 'element', 'params'));
+    }
 
     public function flash($key = 'flash', $attrs = array()) {
         $out = false;
@@ -102,5 +104,72 @@ class Session {
         return $out;
     }
 
+    private static function _write(array $data, $key, $values = null) {
+        $tokens = explode('.', $key);
+
+        if (strpos($key, '{') === false) {
+            return self::_simpleOp('insert', $data, $tokens, $values);
+        }
+
+        $token = array_shift($tokens);
+        $nextPath = implode('.', $tokens);
+        foreach ($data as $k => $v) {
+            if ($k === $token) {
+                $data[$k] = self::_write($v, $nextPath, $values);
+            }
+        }
+        return $data;
+    }
+
+    protected static function _overwrite(&$old, $new) {
+        if (!empty($old)) {
+            foreach ($old as $key => $var) {
+                if (!isset($new[$key])) {
+                    unset($old[$key]);
+                }
+            }
+        }
+        foreach ($new as $key => $var) {
+            $old[$key] = $var;
+        }
+    }
+
+    protected static function _simpleOp($op, $data, $path, $values = null) {
+        $_list = & $data;
+
+        $count = count($path);
+        $last = $count - 1;
+
+        foreach ($path as $i => $key) {
+            if (is_numeric($key) && intval($key) > 0 || $key === '0') {
+                $key = intval($key);
+            }
+            if ($op === 'insert') {
+                if ($i === $last) {
+                    $_list[$key] = $values;
+                    return $data;
+                }
+                if (!isset($_list[$key])) {
+                    $_list[$key] = array();
+                }
+                $_list = & $_list[$key];
+                if (!is_array($_list)) {
+                    $_list = array();
+                }
+            }
+            elseif ($op === 'remove') {
+                if ($i === $last) {
+                    unset($_list[$key]);
+                    return $data;
+                }
+                if (!isset($_list[$key])) {
+                    return $data;
+                }
+                $_list = & $_list[$key];
+            }
+        }
+    }
+
 }
+
 // end
