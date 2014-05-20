@@ -34,7 +34,10 @@ class View {
                 break;
             default:
                 $this->url[1] = isset($this->url[1]) ? strtolower($this->url[1]) : 'index';
-                include APP . VIEW . $this->url[0] . DS . $this->url[1] . '.php';
+                $view_file = APP . VIEW . $this->url[0] . DS . $this->url[1] . '.php';
+                if (file_exists($view_file)) {
+                    include $view_file;
+                }
                 break;
         }
     }

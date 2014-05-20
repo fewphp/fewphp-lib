@@ -6,19 +6,14 @@ class Session {
 
     public static function init() {
         session_start();
-        $_SESSION['1'] = 1;
     }
 
     public static function write($key, $value) {
         if (stripos($key, '.')) {
             $write = array($key => $value);
             foreach ($write as $k => $val) {
-                self::_overwrite($_SESSION, self::_write($_SESSION, $k, $val));
-//                if (Hash::get($_SESSION, $key) !== $val) {
-//                    return false;
-//                }
+                self::_overwrite($_SESSION, self::_simpleOp('insert', $_SESSION,  explode('.', $k), $val));
             }
-            var_dump($_SESSION);
             return true;
         }
         else {
@@ -42,8 +37,8 @@ class Session {
     }
 
     public static function delete($key = null) {
-        if ($key) {
-            unset($_SESSION[$key]);
+        if (stripos($key, '.')) {
+            self::_overwrite($_SESSION, self::_simpleOp('remove', $_SESSION, explode('.', $key)));
         }
         else {
             session_destroy();
@@ -102,23 +97,6 @@ class Session {
             self::delete('Message.' . $key);
         }
         return $out;
-    }
-
-    private static function _write(array $data, $key, $values = null) {
-        $tokens = explode('.', $key);
-
-        if (strpos($key, '{') === false) {
-            return self::_simpleOp('insert', $data, $tokens, $values);
-        }
-
-        $token = array_shift($tokens);
-        $nextPath = implode('.', $tokens);
-        foreach ($data as $k => $v) {
-            if ($k === $token) {
-                $data[$k] = self::_write($v, $nextPath, $values);
-            }
-        }
-        return $data;
     }
 
     protected static function _overwrite(&$old, $new) {
